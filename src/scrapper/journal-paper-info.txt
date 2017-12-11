@@ -1,0 +1,16 @@
+Regional Patterns and Vulnerability Analysis of Chinese Web Passwords.	Weili Han,Zhigong Li,Lang Yuan,Wenyuan Xu	0	https://doi.org/10.1109/TIFS.2015.2490620	Volume 11: 2016
+Cracking More Password Hashes With Patterns.	Emin Islam Tatli	0	https://doi.org/10.1109/TIFS.2015.2422259	Volume 10: 2015
+Next Gen PCFG Password Cracking.	Shiva Houshmand,Sudhir Aggarwal,R. Flood	0	https://doi.org/10.1109/TIFS.2015.2428671	Volume 10: 2015
+Learning Multi-Boosted HMMs for Lip-Password Based Speaker Verification.	Xin Liu,Yiu-ming Cheung	0	https://doi.org/10.1109/TIFS.2013.2293025	Volume 9: 2014
+Captcha as Graphical Passwords - A New Security Primitive Based on Hard AI Problems.	Bin B. Zhu,Jeff Yan,Guanbo Bao,Maowei Yang,Ning Xu	0	https://doi.org/10.1109/TIFS.2014.2312547	Volume 9: 2014
+oPass: A User Authentication Protocol Resistant to Password Stealing and Password Reuse Attacks.	Hung-Min Sun,Yao-Hsin Chen,Yue-Hsun Lin	0	https://doi.org/10.1109/TIFS.2011.2169958	Volume 7: 2012
+User Study, Analysis, and Usable Security of Passwords Based on Digital Objects.	Robert Biddle,Mohammad Mannan,Paul C. van Oorschot,Tara Whalen	0	https://doi.org/10.1109/TIFS.2011.2116781	Volume 6: 2011
+Purely automated attacks on passpoints-style graphical passwords.	Paul C. van Oorschot,Amirali Salehi-Abari,Julie Thorpe	0	https://doi.org/10.1109/TIFS.2010.2053706	Volume 5: 2010
+Graphical passwords based on robust discretization.	Jean-Camille Birget,Dawei Hong,Nasir D. Memon	0	https://doi.org/10.1109/TIFS.2006.879305	Volume 1: 2006
+Zero-Sum Password Cracking Game: A Large-Scale Empirical Study on the Crackability, Correlation, and Security of Passwords.	Shouling Ji,Shukun Yang,Xin Hu,Weili Han,Zhigong Li,Raheem A. Beyah	0	https://doi.org/10.1109/TDSC.2015.2481884	Volume 14: 2017
+Security Analysis of Password-Authenticated Key Retrieval.	SeongHan Shin,Kazukuni Kobara	0	https://doi.org/10.1109/TDSC.2015.2490064	Volume 14: 2017
+Achieving Flatness: Selecting the Honeywords from Existing User Passwords.	Imran Erguler	0	https://doi.org/10.1109/TDSC.2015.2406707	Volume 13: 2016
+Password Extraction via Reconstructed Wireless Mouse Trajectory.	Xian Pan,Zhen Ling,Aniket Pingley,Wei Yu,Nan Zhang,Kui Ren,Xinwen Fu	0	https://doi.org/10.1109/TDSC.2015.2413410	Volume 13: 2016
+Revisiting Defenses against Large-Scale Online Password Guessing Attacks.	Mansour Alsaleh,Mohammad Mannan,Paul C. van Oorschot	0	https://doi.org/10.1109/TDSC.2011.24	Volume 9: 2012
+A Practical Password-Based Two-Server Authentication and Key Exchange System.	Yanjiang Yang,Robert H. Deng,Feng Bao	0	https://doi.org/10.1109/TDSC.2006.16	Volume 3: 2006
+Neural Network Techniques for Proactive Password Checking.	Angelo Ciaramella,Paolo D'Arco,Alfredo De Santis,Clemente Galdi,Roberto Tagliaferri	0	https://doi.org/10.1109/TDSC.2006.53	Volume 3: 2006
