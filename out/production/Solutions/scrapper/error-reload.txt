@@ -1,0 +1,2 @@
+Human-Seeded Attacks and Exploiting Hot-Spots in Graphical Passwords.	Julie Thorpe,Paul C. van Oorschot	2007	https://www.usenix.org/conference/16th-usenix-security-symposium/human-seeded-attacks-and-exploiting-hot-spots-graphical
+Halting Password Puzzles: Hard-to-break Encryption from Human-memorable Keys.	Xavier Boyen	2007	https://www.usenix.org/conference/16th-usenix-security-symposium/halting-password-puzzles-hard-break-encryption-human
