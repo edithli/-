@@ -29,8 +29,9 @@ public class Miscellaneous {
 //        FunctionGrowth();
 //        Fibonacci(10);
 //        EstimatePI(1000000);
-        Kary(7582, 2);
-        IntegerToBinaryString(7582);
+//        Kary(7582, 2);
+//        IntegerToBinaryString(7582);
+        Ramanujan(2000);
     }
 
     private static void IntegerToBinaryString(int n){
@@ -185,6 +186,51 @@ public class Miscellaneous {
             System.out.println(f);
             f = f+g;
             g = f-g;
+        }
+    }
+
+    // !!!
+    // return all numbers less or equal than n that is two pairs of numbers whose cube sum are the same
+    private static void Ramanujan(int n){
+//        int max = (int)Math.sqrt(n);
+//        for (int i = 0; i < max; i++){
+//            for (int j = 0; j < max; j++){
+//                if (i*i*i+j*j*j == n){
+//                    for (int k = i+1; k < max; k++){
+//                        for (int l = 0; l < max; l++){
+//                            if (k*k*k+l*l*l == n){
+//                                if (l != i && l != j){
+//                                    System.out.println(i+"^3+"+j+"^3="+k+"^3+"+l+"^3="+n);
+//                                    return;
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//        System.out.println("dull number " + n);
+        for (int i = 1; i < n; i++){
+            int i3 = i*i*i;
+            if (i3>=n) break;
+            for (int j = i; j<n; j++){
+                int j3 = j*j*j;
+                if (j3>=n)break;
+                for (int k = j; k < n; k++){
+                    int k3 = k*k*k;
+                    if (k3>=n) break;
+                    for (int l = k; l < n; l++){
+                        int l3 = l*l*l;
+                        if (l3 >= n) break;
+                        if (i3+j3 == k3+l3){
+                            if (k != i && k != j)
+                                System.out.println(i+"^3+"+j+"^3="+k+"^3+"+l+"^3="+(k3+j3));
+
+                        }
+                        System.out.println(i+","+j+","+k+","+l);
+                    }
+                }
+            }
         }
     }
 }
