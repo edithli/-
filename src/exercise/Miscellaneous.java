@@ -31,7 +31,51 @@ public class Miscellaneous {
 //        EstimatePI(1000000);
 //        Kary(7582, 2);
 //        IntegerToBinaryString(7582);
-        Ramanujan(2000);
+//        Ramanujan(100000000);
+//        Checksum(20131452);
+//        Exp(-10);
+        MonteHall(1000000);
+    }
+    static int maxCrossingSum(int arr[], int l, int m, int h) {
+        int sum = 0;
+        int left_sum = Integer.MIN_VALUE;
+        for (int i = m; i >= l; i--) {
+            sum = sum + arr[i];
+            if (sum > left_sum)
+                left_sum = sum;
+        }
+        sum = 0;
+        int right_sum = Integer.MIN_VALUE;
+        for (int i = m + 1; i <= h; i++)
+            sum = sum + arr[i];
+        if (sum > right_sum)
+            right_sum = sum;
+        return left_sum + right_sum;
+    }
+
+    static int maxSubArraySum(int arr[], int l, int h) {
+        if (l == h)
+            return arr[l];
+        int m = (l + h)/2;
+        return Math.max(Math.max(maxSubArraySum(arr, l, m),
+                maxSubArraySum(arr, m+1, h)),
+                maxCrossingSum(arr, l, m, h));
+    }
+
+    private static void MonteHall(int n){
+        int[] doors = new int[3];
+        int switchWin = 0, unswitchWin = 0;
+        for (int i = 0; i < n; i++){
+            int prize = (int)Math.round(Math.random()*3);
+            int firstChoise = (int)Math.round(Math.random()*3);
+            if (firstChoise == prize){
+                unswitchWin++;
+            }else {
+                switchWin++;
+            }
+        }
+        System.out.println("Switch: " + (double)switchWin/n);
+        System.out.println("Unswitch: " + (double)unswitchWin/n);
     }
 
     private static void IntegerToBinaryString(int n){
@@ -192,45 +236,90 @@ public class Miscellaneous {
     // !!!
     // return all numbers less or equal than n that is two pairs of numbers whose cube sum are the same
     private static void Ramanujan(int n){
-//        int max = (int)Math.sqrt(n);
-//        for (int i = 0; i < max; i++){
-//            for (int j = 0; j < max; j++){
-//                if (i*i*i+j*j*j == n){
-//                    for (int k = i+1; k < max; k++){
-//                        for (int l = 0; l < max; l++){
-//                            if (k*k*k+l*l*l == n){
-//                                if (l != i && l != j){
-//                                    System.out.println(i+"^3+"+j+"^3="+k+"^3+"+l+"^3="+n);
-//                                    return;
-//                                }
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//        System.out.println("dull number " + n);
         for (int i = 1; i < n; i++){
             int i3 = i*i*i;
             if (i3>=n) break;
             for (int j = i; j<n; j++){
                 int j3 = j*j*j;
-                if (j3>=n)break;
-                for (int k = j; k < n; k++){
+                if (j3>=n||j3+i3>n)break;
+                for (int k = i; k < n; k++){
                     int k3 = k*k*k;
                     if (k3>=n) break;
                     for (int l = k; l < n; l++){
                         int l3 = l*l*l;
-                        if (l3 >= n) break;
+                        if (l3 >= n||l3+k3 > n) break;
                         if (i3+j3 == k3+l3){
                             if (k != i && k != j)
-                                System.out.println(i+"^3+"+j+"^3="+k+"^3+"+l+"^3="+(k3+j3));
+                                System.out.println(i+"^3+"+j+"^3="+k+"^3+"+l+"^3="+(k3+l3));
 
                         }
-                        System.out.println(i+","+j+","+k+","+l);
                     }
                 }
             }
         }
+    }
+
+    private static void Checksum(int n){
+        // input a 9-digit integer
+        int DIGIT_COUNT = 9, TOTAL_DIGIT = 10;
+        int[] digits = new int[DIGIT_COUNT];
+        int index = 0;
+        while (n != 0){
+            if (index >= 9)
+                throw new RuntimeException("input should be a 9-digit number");
+            digits[index] = n % 10;
+            System.out.print(digits[index]+" ");
+            n = n/10;
+            index++;
+        }
+        System.out.println();
+        StringBuilder sb = new StringBuilder();
+        for (int i = 1; i <= TOTAL_DIGIT; i++){
+            int sum = 0;
+            for (int j = 0; j < DIGIT_COUNT; j++){
+                sb.insert(0, digits[j]);
+                if (j+1 < i){
+                    sum += (j+1)*digits[j];
+                }else{
+                    sum += (j+2)*digits[j];
+                }
+            }
+            for (int j = 0; j <= 10; j++){
+                int check = i * j;
+                if ((sum+check) % 11 == 0){
+                    System.out.println("checksum: " + j);
+                    System.out.println("position: " + i);
+                    sb.insert(TOTAL_DIGIT-i, j==10?'X':j+"");
+                    System.out.println("ISBN: " + sb.toString());
+                    return;
+                }
+            }
+            sb.delete(0, sb.length());
+        }
+    }
+    private static void Exp(double x){
+        // compute e^x using Taylor series expansion
+//        double result = 1 + x;
+//        int factor = 1;
+//        for (int i = 2; i <= 4; i++){
+//            factor *= i;
+//            result += (Math.pow(x, i)/factor);
+//        }
+//        System.out.println("e^x: " + result);
+        System.out.println(Math.exp(x));
+        boolean isNegative = false;
+        if (x < 0) {
+            x = -x;
+            isNegative = true;
+        }
+        double sum = 0;
+        double term = 1.0;
+        for (int n = 1; sum != sum+term; n++){
+            sum += term;
+            term *= x/n;
+        }
+        if (isNegative)
+            sum = 1.0/sum;
+        System.out.println(sum);
     }
 }
