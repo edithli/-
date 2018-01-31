@@ -15,13 +15,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Fetch paper information from DBLP
+ */
 public class PaperCollector {
     public static void main(String[] args) throws IOException {
 //        MakeForError();
-        String comsurEntry = "http://dblp.uni-trier.de/db/journals/comsur/"; // no password related papers
-        String tifsEntry = "http://dblp.uni-trier.de/db/journals/tifs/";
-        String tdscEntry = "http://dblp.uni-trier.de/db/journals/tdsc/";
-        FetchForJournal(tdscEntry);
+//        String comsurEntry = "http://dblp.uni-trier.de/db/journals/comsur/"; // no password related papers
+//        String tifsEntry = "http://dblp.uni-trier.de/db/journals/tifs/";
+//        String tdscEntry = "http://dblp.uni-trier.de/db/journals/tdsc/";
+//        FetchForJournal(tdscEntry);
+
+//        String[] confs = {"ccs", "sp", "ndss", "uss"};
+//        int[] years = {2013, 2014, 2015, 2016, 2017};
+//        FetchConfPapers("./src/scrapper/pwd-paper-five-year.txt", "./src/scrapper/error.txt", confs, years);
+        FetchBibTex("./src/scrapper/pwd-five.bib", "./src/scrapper/pwd-paper-five-year.txt");
     }
 
     public static void FetchForJournal(String journalEntry) throws IOException {
@@ -77,17 +85,74 @@ public class PaperCollector {
         bw.close();
     }
 
-    public static void FetchForConference() throws IOException {
+    public static void FetchConfPapers(String outputFilename, String errorFilename, String[] confAbbreviations, int[] years) throws IOException {
+        BufferedWriter paperPage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFilename, true)));
+        BufferedWriter errorPage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(errorFilename, true)));
+        for (String conf: confAbbreviations){
+            System.out.println("parsing conf: " + conf);
+            for (int year: years){
+                String url = dblpConfEntry(conf, year);
+                try{
+                    List<PaperInfo> papers = ContentPage(url, year, null);
+                    for (PaperInfo paperInfo: papers){
+                        paperPage.write(paperInfo.toString());
+                        paperPage.newLine();
+                        paperPage.flush();
+                    }
+                }catch (Exception e){
+                    String errormsg = "parse conf page error: " + url;
+                    System.out.println(errormsg);
+                    errorPage.write(errormsg);
+                    errorPage.newLine();
+                    errorPage.flush();
+                }
+            }
+        }
+        paperPage.close();
+        errorPage.close();
+    }
+
+    public static void FetchBibTex(String outputFilename, String paperFilename) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(paperFilename)));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outputFilename, true)));
+        String line;
+        while ((line = br.readLine()) != null){
+            String[] splits = line.split("\t");
+            String dblpkey = splits[splits.length-1];
+            if (!dblpkey.startsWith("conf") && !dblpkey.startsWith("journals")){
+                System.out.println("no dblp key found : " + splits[0] + "\t" + dblpkey);
+            }else try{
+                bw.write(BibTexPage(dblpkey));
+                bw.newLine();
+                bw.flush();
+            }catch (IOException e){
+                System.out.println("error: " + dblpkey + "\t" + splits[0]);
+            }
+        }
+        br.close();
+        bw.close();
+    }
+
+    public static String BibTexPage(String dblpKey) throws IOException {
+        String url = "http://dblp.uni-trier.de/rec/bibtex/" + dblpKey;
+        Document doc = Jsoup.connect(url).get();
+        Element bibsec = doc.getElementById("bibtex-section");
+        return bibsec.child(0).text();
+    }
+
+    // legacy code that separately fetch entry and fetch paper
+    public static void FetchForConference(String errorFilename) throws IOException {
         String ccsEntry = "http://dblp.uni-trier.de/db/conf/ccs/";
         String spEntry = "http://dblp.uni-trier.de/db/conf/sp/";
         String usenixEntry = "http://dblp.uni-trier.de/db/conf/uss/";
         String ndssEntry = "http://dblp.uni-trier.de/db/conf/ndss/";
         String[] topfour = {ccsEntry, spEntry, usenixEntry, ndssEntry};
         BufferedWriter confPage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("conf.txt", true)));
-        BufferedWriter errorPage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("error.txt", true)));
+        BufferedWriter errorPage = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(errorFilename, true)));
         List<ConferenceInfo> confEntries = new ArrayList<>();
         for (String entry: topfour){
             try{
+                // legacy code that fetch entry url of each conf from dblp search site
                 List<ConferenceInfo> entryList = ConferencePage(entry);
                 for (ConferenceInfo confinfo: entryList) {
                     confPage.write(confinfo.dblpUrl);
@@ -122,6 +187,10 @@ public class PaperCollector {
         }
         bw.close();
         errorPage.close();
+    }
+
+    private static String dblpConfEntry(String abrv, int year){
+        return String.format("http://dblp.uni-trier.de/db/conf/%s/%s%d", abrv, abrv, year);
     }
 
     public static void MakeForError() throws IOException {
@@ -190,25 +259,46 @@ public class PaperCollector {
         Elements titles = doc.getElementsByClass("title");
         for (Element titleEle: titles){
             if (titleEle.text().toLowerCase().contains("password")){
+                // fetch title
                 String title = titleEle.text();
                 Element nav = titleEle.parent().previousElementSibling();
                 String link = nav.child(0).child(0).child(1).child(1).child(0).child(0).attr("href");
                 List<String> authors = new ArrayList<>();
+                String page = "";
                 Element parent = titleEle.parent();
                 for(Element child: parent.children()){
+                    // fetch authors
                     if (child.attr("itemprop").equals("author")){
                         authors.add(child.text());
+                    }else if (child.attr("itemprop").equals("pagination")){
+                        // fetch page
+                        page = child.text();
                     }
+                }
+                // fetch bib url
+                String dblpkey = "";
+                try {
+                    Element navEle = parent.previousElementSibling();
+//                    System.out.println(navEle.tagName());
+//                    System.out.println(navEle.child(0).tagName());
+//                    System.out.println(navEle.child(0).child(1).tagName());
+//                    System.out.println(navEle.child(0).child(1).child(1).tagName());
+//                    System.out.println(navEle.child(0).child(1).child(1).child(3).tagName());
+//                    System.out.println(navEle.child(0).child(1).child(1).child(3).child(0).child(0).html());
+                    dblpkey = navEle.child(0).child(1).child(1).child(3).child(0).child(0).html();
+//                    System.out.println(dblpkey);
+                }catch(Exception e){
+                    System.out.println("no dblp key found for " + title);
                 }
                 PaperInfo paper;
                 if (info == null)
-                    paper = new PaperInfo(title, authors, year, link);
+                    paper = new PaperInfo(title, authors, year, link, page, dblpkey);
                 else
-                    paper = new PaperInfo(title, authors, info, link);
+                    paper = new PaperInfo(title, authors, info, link, page, dblpkey);
                 papers.add(paper);
                 System.out.println(paper.toString());
             }else{
-                System.out.println("not related: " + titleEle.text());
+//                System.out.println("not related: " + titleEle.text());
             }
         }
         return papers;
@@ -226,7 +316,7 @@ class ConferenceInfo{
 }
 
 class JournalInfo{
-    String dblpUrl;
+    String dblpUrl;         // journal url in dblp
     String volumnInfo;
     JournalInfo(String dblpUrl, String volumnInfo){
         this.dblpUrl = dblpUrl;
@@ -236,22 +326,28 @@ class JournalInfo{
 }
 
 class PaperInfo {
-    String title;
-    List<String> authors;
-    int year;
-    String url;
-    String info;
-    PaperInfo(String title, List<String> authors, int year, String url){
+    String title;           // paper title
+    List<String> authors;   // author list with full names
+    int year;               // publish year
+    String url;             // fetch url (maybe inaccessible)
+    String info;            // volume and year info of journal paper
+    String page;            // page number in conference or journal (empty if null)
+    String dblpKey;          // dblp key for BibTex (maybe null)
+    PaperInfo(String title, List<String> authors, int year, String url, String page, String dblpKey){
         this.title = title;
         this.authors = authors;
         this.url = url;
         this.year = year;
+        this.page = page;
+        this.dblpKey = dblpKey;
     }
-    PaperInfo(String title, List<String> authors, String info, String url){
+    PaperInfo(String title, List<String> authors, String info, String url, String page, String dblpKey){
         this.title = title;
         this.authors = authors;
         this.url = url;
         this.info = info;
+        this.page = page;
+        this.dblpKey = dblpKey;
     }
     public String toString(){
         StringBuilder sb = new StringBuilder();
@@ -266,6 +362,10 @@ class PaperInfo {
         sb.append(year);
         sb.append("\t");
         sb.append(url);
+        sb.append("\t");
+        sb.append(page);
+        sb.append("\t");
+        sb.append(dblpKey == null ? "" : dblpKey);
         if (info != null){
             sb.append("\t");
             sb.append(info);
